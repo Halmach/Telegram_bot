@@ -1,6 +1,7 @@
 ﻿using System;
-using Telegram.Bot;
+using System.Collections.Generic;
 using Telegram.Bot.Args;
+using Telegram.Bot.Types;
 
 namespace Telegram_bot
 {
@@ -27,32 +28,16 @@ namespace Telegram_bot
 
     }
 
-    class BotWorker
+    class Conversation
     {
-        ITelegramBotClient botClient;
-        public void Initialize(string token)
-        {
-            botClient = new TelegramBotClient(token);
-        }
+        private Chat telegramChat;
 
-        public void Start()
-        {
-            botClient.OnMessage += BotClient_OnMessage;
-            botClient.StartReceiving();
-        }
+        private List<Message> telegramMessages;
 
-        private  async void BotClient_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
+        public Conversation(Chat chat)
         {
-            if (e.Message.Text != null)
-            {
-                await botClient.SendTextMessageAsync(chatId: e.Message.Chat, text: "Вы написали:\n" + e.Message.Text);
-            }
+            telegramChat = chat;
+            telegramMessages = new List<Message>();
         }
-
-        public void Stop()
-        {
-            botClient.StopReceiving();
-        }
-
     }
 }
