@@ -6,29 +6,13 @@ namespace Telegram_bot
 {
     class Program
     {
-        static ITelegramBotClient botClient;
 
         static void Main(string[] args)
         {
-            // Этот объект обрабатывает все обращения к боту. 
-            botClient = new TelegramBotClient(BotCredentials.BotToken);
-            var me = botClient.GetMeAsync().Result;
-            Console.WriteLine("Привет! Меня зовут {0}.", me.FirstName);
-            botClient.OnMessage += BotClient_OnMessage;
-            botClient.StartReceiving();
-            Console.ReadKey();
-            botClient.StopReceiving();
+
         }
 
-        private static async void BotClient_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
-        {
-            if (e.Message.Text !=null)
-            {
-                Console.WriteLine($"Получено сообщение в чате:{e.Message.Chat.Id}");
-                Console.WriteLine(e.Message.Text);
-                await botClient.SendTextMessageAsync(chatId: e.Message.Chat, text: "Вы написали:\n" + e.Message.Text);
-            }
-        }
+
     }
 
     class BotWorker
@@ -41,7 +25,16 @@ namespace Telegram_bot
 
         public void Start()
         {
+            botClient.OnMessage += BotClient_OnMessage;
             botClient.StartReceiving();
+        }
+
+        private  async void BotClient_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
+        {
+            if (e.Message.Text != null)
+            {
+                await botClient.SendTextMessageAsync(chatId: e.Message.Chat, text: "Вы написали:\n" + e.Message.Text);
+            }
         }
 
         public void Stop()
