@@ -14,5 +14,15 @@ namespace Telegram_bot
             telegramChat = chat;
             telegramMessages = new List<Message>();
         }
+
+        public void AddMessage(Message eMessage)
+        {
+            telegramMessages.Add(eMessage);
+        }
+
+        public ChatId GetId()
+        {
+            return null;
+        }
     }
 }
