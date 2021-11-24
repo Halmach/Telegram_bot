@@ -2,9 +2,9 @@
 {
     class Messenger
     {
-        public object CreateTextMessage(Conversation chat)
+        public string CreateTextMessage(Conversation chat)
         {
-            throw new System.NotImplementedException();
+          //  return "";
         }
     }
 }
