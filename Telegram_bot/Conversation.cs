@@ -24,5 +24,19 @@ namespace Telegram_bot
         {
             return null;
         }
+
+        public List<string> GetTextMessages()
+        {
+            var textMessages = new List<string>();
+            foreach (var message in telegramMessages)
+            {
+                if (message.Text != null)
+                {
+                    textMessages.Add(message.Text);
+                }
+            }
+
+            return textMessages;
+        }
     }
 }
