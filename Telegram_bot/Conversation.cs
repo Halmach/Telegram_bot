@@ -20,10 +20,7 @@ namespace Telegram_bot
             telegramMessages.Add(eMessage);
         }
 
-        public ChatId GetId()
-        {
-            return null;
-        }
+        public long GetId() => telegramChat.Id;
 
         public List<string> GetTextMessages()
         {
@@ -38,5 +35,7 @@ namespace Telegram_bot
 
             return textMessages;
         }
+
+        public string GetLastMessage() => telegramMessages[telegramMessages.Count - 1].Text;
     }
 }

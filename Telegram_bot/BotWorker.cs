@@ -9,7 +9,7 @@ namespace Telegram_bot
         public void Initialize(string token)
         {
             botClient = new TelegramBotClient(token);
-            logic = new BotMessageLogic();
+            logic = new BotMessageLogic(botClient);
         }
 
         public void Start()
@@ -23,7 +23,7 @@ namespace Telegram_bot
         {
             if (e.Message.Text != null)
             {
-                await botClient.SendTextMessageAsync(chatId: e.Message.Chat, text: "Вы написали:\n" + e.Message.Text);
+                await logic.Response(e);
             }
         }
 
