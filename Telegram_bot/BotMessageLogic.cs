@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading.Tasks;
 using Telegram.Bot;
 using Telegram.Bot.Args;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Telegram_bot
 {
@@ -25,13 +26,51 @@ namespace Telegram_bot
             chat.AddMessage(e.Message);
 
             await SendTextMessage(chat);
+
+
         }
 
         private async Task SendTextMessage(Conversation chat)
         {
             var text = messanger.CreateTextMessage(chat);
 
-            await botClient.SendTextMessageAsync(chatId: chat.GetId(), text:text);
+            
+            int numButtonCommand = messanger.isThisButton(chat);
+            if(numButtonCommand == 1) 
+                await SendTextWithKeyBoard(chat, text, ReturnKeyBoard());
+            else await botClient.SendTextMessageAsync(chatId: chat.GetId(), text: text);
+        }
+
+       
+
+        private async Task SendTextWithKeyBoard(Conversation chat, string text, InlineKeyboardMarkup keyboard)
+        {
+            await botClient.SendTextMessageAsync(
+                chatId: chat.GetId(), text: text, replyMarkup: keyboard);
+        }
+
+       
+
+        public InlineKeyboardMarkup ReturnKeyBoard()
+        {
+            var buttonList = new List<InlineKeyboardButton>
+            {
+                new InlineKeyboardButton
+                {
+                    Text = "Пушкин",
+                    CallbackData = "pushkin"
+                },
+
+                new InlineKeyboardButton
+                {
+                    Text = "Есенин",
+                    CallbackData = "esenin"
+                }
+
+            };
+            var keyboard = new InlineKeyboardMarkup(buttonList);
+
+            return keyboard;
         }
 
         public BotMessageLogic(ITelegramBotClient botClient)
@@ -41,5 +80,7 @@ namespace Telegram_bot
             messanger = new Messenger();
 
         }
+
+
     }
 }

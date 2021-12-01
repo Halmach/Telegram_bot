@@ -1,4 +1,5 @@
 ﻿using Telegram.Bot;
+using Telegram.Bot.Args;
 
 namespace Telegram_bot
 {
@@ -15,6 +16,7 @@ namespace Telegram_bot
         public void Start()
         {
             botClient.OnMessage += BotClient_OnMessage;
+            botClient.OnCallbackQuery += Bot_Callback;
             botClient.StartReceiving();
 
         }
@@ -25,6 +27,31 @@ namespace Telegram_bot
             {
                 await logic.Response(e);
             }
+        }
+
+        private async void Bot_Callback(object sender, CallbackQueryEventArgs e)
+        {
+            var text = "";
+
+            switch (e.CallbackQuery.Data)
+            {
+                case "pushkin":
+                    text = @"Я помню чудное мгновенье:
+                                    Передо мной явилась ты,
+                                    Как мимолетное виденье,
+                                    Как гений чистой красоты.";
+                    break;
+                case "esenin":
+                    text = @"Не каждый умеет петь,
+                                Не каждому дано яблоком
+                                Падать к чужим ногам.";
+                    break;
+                default:
+                    break;
+            }
+
+            await botClient.SendTextMessageAsync(e.CallbackQuery.Message.Chat.Id, text);
+            await botClient.AnswerCallbackQueryAsync(e.CallbackQuery.Id);
         }
 
         public void Stop()

@@ -2,7 +2,7 @@
 {
     internal static class BotCredentials
     {
-        private static string botToken = "2134031347:AAHUa4ERojB-8-4g-t_eQ5UqHdwJHdQqXq4";
+        private static string botToken = "2100860016:AAEBuIcz2Wj3kYxOC1PN3NukehvpMJ8lpt8";
 
         public static string BotToken
         {
