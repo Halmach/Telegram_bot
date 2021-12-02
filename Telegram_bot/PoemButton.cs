@@ -1,0 +1,76 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Text;
+using Telegram.Bot;
+using Telegram.Bot.Args;
+using Telegram.Bot.Types.ReplyMarkups;
+
+namespace Telegram_bot
+{
+    class PoemButton : AbstractCommand, IButtonCommand
+    {
+        ITelegramBotClient botClient;
+
+        public PoemButton(ITelegramBotClient botClient)
+        {
+            this.botClient = botClient;
+            CommandText = "/poembuttons";
+        }
+        public InlineKeyboardMarkup ReturnKeyBoard()
+        {
+            var buttonList = new List<InlineKeyboardButton>
+            {
+                new InlineKeyboardButton
+                {
+                    Text = "Пушкин",
+                    CallbackData = "pushkin"
+                },
+
+                new InlineKeyboardButton
+                {
+                    Text = "Есенин",
+                    CallbackData = "esenin"
+                }
+            };
+
+            var keyboard = new InlineKeyboardMarkup(buttonList);
+            return keyboard;
+        }
+
+        public string GetInformation()
+        {
+            return "Выберите поэта";
+        }
+
+        public void AddCallBack(Conversation chat)
+        {
+            botClient.OnCallbackQuery -= Bot_Callback;
+            botClient.OnCallbackQuery += Bot_Callback;
+        }
+
+        private async void Bot_Callback(object sender, CallbackQueryEventArgs e)
+        {
+            var text = "";
+
+            switch (e.CallbackQuery.Data)
+            {
+                case "pushkin":
+                    text = @"Я помню чудное мгновенье:
+                                    Передо мной явилась ты,
+                                    Как мимолетное виденье,
+                                    Как гений чистой красоты.";
+                    break;
+                case "esenin":
+                    text = @"Не каждый умеет петь,
+                                Не каждому дано яблоком
+                                Падать к чужим ногам.";
+                    break;
+                default:
+                    break;
+            }
+
+            await botClient.SendTextMessageAsync(e.CallbackQuery.Message.Chat.Id, text);
+            await botClient.AnswerCallbackQueryAsync(e.CallbackQuery.Id);
+        }
+    }
+}

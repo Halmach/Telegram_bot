@@ -3,7 +3,7 @@ using Telegram.Bot.Types;
 
 namespace Telegram_bot
 {
-    class Conversation
+    public class Conversation
     {
         private Chat telegramChat;
 

@@ -1,37 +1,76 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
+using Telegram.Bot;
+using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Telegram_bot
 {
     class Messenger
     {
-        public string CreateTextMessage(Conversation chat)
+        private CommandParser parser;
+        private ITelegramBotClient botClient;
+
+        public Messenger(ITelegramBotClient telegramBotClient)
         {
-            var text = "";
-            switch (chat.GetLastMessage())
+            botClient = telegramBotClient;
+            parser = new CommandParser(botClient);
+        }
+        public async Task MakeAnswer(Conversation chat)
+        {
+            var lastmessage = chat.GetLastMessage();
+
+            if (parser.IsCommand(lastmessage))
             {
-                case "/saymechi": text = "Привет";
-                    break;
-                case "/askme": text = "Как дела?"; break;
-
-                case "/poembuttons": text = "Выберите поэта"; break;
-
-                default:
-                {
-                    var textList = chat.GetTextMessages();
-                    var delimiter = ",";
-                    text = "Your history:" + string.Join(delimiter, textList.ToArray());
-                }
-                    break;
-
+                await ExecCommand(chat, lastmessage);
             }
-            return text;
+            else
+            {
+                // var text = CreateMessageError();
+                var text = CreateTextMessage(chat);
+                await SendText(chat, text);
+            }
         }
 
-        public int isThisButton(Conversation chat)
+        private async Task SendText(Conversation chat, string text)
         {
-            string command = chat.GetLastMessage();
-            if (command == "/poembuttons") return 1;
-            else return 0;
+            await botClient.SendTextMessageAsync(chatId: chat.GetId(), text: text);
+        }
+
+        private async Task SendTextAndKeyBoard(Conversation chat, string text, InlineKeyboardMarkup keyboard)
+        {
+            await botClient.SendTextMessageAsync(chatId: chat.GetId(), text: text, replyMarkup: keyboard);
+        }
+
+        private string CreateMessageError()
+        {
+            return "Is not command";
+        }
+
+        private async Task ExecCommand(Conversation chat, string lastmessage)
+        {
+            if (parser.IsTextCommand(lastmessage))
+            {
+                var text = parser.GetTextCommandAnswer(lastmessage);
+                await SendText(chat, text);
+            }
+
+            if (parser.IsButtonCommand(lastmessage))
+            {
+                var text = parser.GetTextButtonCommand(lastmessage); // остановился тут, нужно выдать текстовое сообщение кнопочной команды, а другим методом выдать кнопки и отправить в телегу
+                var key = parser.GetKeyBoard(lastmessage);
+                parser.AddCallback(lastmessage, chat);
+                await SendTextAndKeyBoard(chat,text,key);
+            }
+        }
+
+        public string CreateTextMessage(Conversation chat)
+        {
+            var text = string.Empty;
+            var textList = chat.GetTextMessages();
+            var delimiter = ",";
+            text = "Your history:" + string.Join(delimiter, textList.ToArray());
+
+            return text;
         }
 
 
