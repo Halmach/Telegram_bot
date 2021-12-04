@@ -18,7 +18,11 @@ namespace Telegram_bot
         public async Task MakeAnswer(Conversation chat)
         {
             var lastmessage = chat.GetLastMessage();
-
+            if(chat.IsAddInProgress)
+            {
+                parser.NextStage(chat, lastmessage);
+                return;
+            }
             if (parser.IsCommand(lastmessage))
             {
                 await ExecCommand(chat, lastmessage);
@@ -56,10 +60,16 @@ namespace Telegram_bot
 
             if (parser.IsButtonCommand(lastmessage))
             {
-                var text = parser.GetTextButtonCommand(lastmessage); // остановился тут, нужно выдать текстовое сообщение кнопочной команды, а другим методом выдать кнопки и отправить в телегу
+                var text = parser.GetTextButtonCommand(lastmessage); 
                 var key = parser.GetKeyBoard(lastmessage);
                 parser.AddCallback(lastmessage, chat);
                 await SendTextAndKeyBoard(chat,text,key);
+            }
+
+            if (parser.IsAddCommand(lastmessage))
+            {
+                chat.IsAddInProgress = true;
+                parser.AddWord(lastmessage,chat);
             }
         }
 

@@ -9,6 +9,7 @@ namespace Telegram_bot
     {
         private List<IChatCommand> Command;
         private ITelegramBotClient botClient;
+        public AddController Addcontroller;
 
         public CommandParser(ITelegramBotClient botClient)
         {
@@ -16,6 +17,15 @@ namespace Telegram_bot
             Command = new List<IChatCommand>();
             Command.Add(new SayHiCommand());
             Command.Add(new PoemButton(botClient));
+            Command.Add(new AddWordCommand(botClient));
+            Addcontroller = new AddController();
+        }
+
+        public void NextStage(Conversation chat, string message)
+        {
+            var command = Command.Find(x => x is AddWordCommand) as AddWordCommand;
+            command.NextStep(chat,message, Addcontroller.GetState(chat));
+            Addcontroller.NextState(chat);
         }
 
         public bool IsCommand(string message)
@@ -59,6 +69,19 @@ namespace Telegram_bot
         {
             var command = Command.Find(x => x.CheckMessage(message)) as IButtonCommand;
             command.AddCallBack(chat);
+        }
+
+        public bool IsAddCommand(string message)
+        {
+            var command = Command.Find(x => x.CheckMessage(message));
+            return command is AddWordCommand;
+        }
+
+        public void AddWord(string message, Conversation chat)
+        {
+            var command = Command.Find(x => x.CheckMessage(message)) as AddWordCommand;
+            Addcontroller.SetFirstState(chat);
+            command.ExecuteCommandAsync(chat);
         }
     }
 }
