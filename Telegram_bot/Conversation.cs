@@ -9,10 +9,18 @@ namespace Telegram_bot
 
         private List<Message> telegramMessages;
 
+        public Dictionary<string, Word> wordDictionary;
+        
+
+        private bool isAddInProgress = false;
+
+        public bool IsAddInProgress { get => isAddInProgress; set => isAddInProgress = value; }
+
         public Conversation(Chat chat)
         {
             telegramChat = chat;
             telegramMessages = new List<Message>();
+            wordDictionary = new Dictionary<string, Word>();
         }
 
         public void AddMessage(Message eMessage)
@@ -37,5 +45,7 @@ namespace Telegram_bot
         }
 
         public string GetLastMessage() => telegramMessages[telegramMessages.Count - 1].Text;
+
+        
     }
 }
