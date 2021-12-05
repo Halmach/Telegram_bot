@@ -71,6 +71,11 @@ namespace Telegram_bot
                 chat.IsAddInProgress = true;
                 parser.AddWord(lastmessage,chat);
             }
+
+            if(parser.IsTextCommandWithAction(lastmessage))
+            {
+                parser.DoForTextCommandWithAction(chat, lastmessage);
+            }
         }
 
         public string CreateTextMessage(Conversation chat)
