@@ -18,6 +18,11 @@ namespace Telegram_bot
         public async Task MakeAnswer(Conversation chat)
         {
             var lastmessage = chat.GetLastMessage();
+            if(chat.IsTrainingInProgress)
+            {
+                parser.NextWord(chat,lastmessage);
+                return;
+            }
             if(chat.IsAddInProgress)
             {
                 parser.NextStage(chat, lastmessage);

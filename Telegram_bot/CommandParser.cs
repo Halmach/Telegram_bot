@@ -20,8 +20,11 @@ namespace Telegram_bot
             Command.Add(new AddWordCommand(botClient));
             Command.Add(new DeleteCommand(botClient));
             Command.Add(new ShowDictionaryCommand(botClient));
+            Command.Add(new TrainingCommand(botClient));
             Addcontroller = new AddController();
         }
+
+
 
         public bool IsAddCommand(string message)
         {
@@ -114,6 +117,12 @@ namespace Telegram_bot
             var onlyCommand = CommandParse(message);
             var command = Command.Find(x => x.CheckMessage(onlyCommand)) as IChatTextCommandWithAction;
             command.textOperation(chat);
+        }
+
+        public void NextWord(Conversation chat, string message)
+        {
+            var command = Command.Find(x => x is TrainingCommand) as TrainingCommand;
+            command.NextWord(chat, message);
         }
     }
 }

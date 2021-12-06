@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Telegram.Bot.Types;
 
 namespace Telegram_bot
@@ -14,7 +15,10 @@ namespace Telegram_bot
 
         private bool isAddInProgress = false;
 
+        private bool isTrainingInProgress = false;
+
         public bool IsAddInProgress { get => isAddInProgress; set => isAddInProgress = value; }
+        public bool IsTrainingInProgress { get => isTrainingInProgress; set => isTrainingInProgress = value; }
 
         public Conversation(Chat chat)
         {
