@@ -8,8 +8,6 @@ namespace Telegram_bot
 {
     public interface IChatTextCommandWithAction
     {
-
-
-        public void textOperation(Conversation chat);
+        public void TextOperation(Conversation chat);
     }
 }

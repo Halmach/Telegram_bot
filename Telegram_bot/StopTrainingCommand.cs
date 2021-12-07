@@ -7,19 +7,19 @@ namespace Telegram_bot
 {
     public class StopTrainingCommand : AbstractCommand, IChatTextCommandWithAction
     {
-        ITelegramBotClient botClient;
+        private ITelegramBotClient botClient;
 
         public StopTrainingCommand(ITelegramBotClient botClient)
         {
             this.botClient = botClient;
-            CommandText = "/stop";
+            this.commandText = "/stop";
         }
 
-        public void textOperation(Conversation chat)
+        public void TextOperation(Conversation chat)
         {
             long key = chat.GetId();
             chat.IsTrainingInProgress = false;
-            botClient.SendTextMessageAsync(key, "Тренировка окончена");
+            this.botClient.SendTextMessageAsync(key, "Тренировка окончена");
         }
     }
 }

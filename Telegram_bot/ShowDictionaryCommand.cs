@@ -5,28 +5,34 @@ using Telegram.Bot;
 
 namespace Telegram_bot
 {
-    class ShowDictionaryCommand : AbstractCommand, IChatTextCommandWithAction
+    public class ShowDictionaryCommand : AbstractCommand, IChatTextCommandWithAction
     {
-        ITelegramBotClient botClient;
+        private ITelegramBotClient botClient;
+
         public ShowDictionaryCommand(ITelegramBotClient botClient)
         {
-            CommandText = "/dictionary";
+            this.commandText = "/dictionary";
             this.botClient = botClient;
         }
 
-
-
-        public void textOperation(Conversation chat)
+        public void TextOperation(Conversation chat)
         {
             long  key = chat.GetId();
-            var text = String.Empty;
-            foreach (var word in chat.wordDictionary)
+            var text = string.Empty;
+            foreach (var word in chat.WordDictionary)
             {
-                text += word.Value.russian + "\n"; 
+                text += word.Value.Russian + "\n"; 
             }
+
             text = text.Trim();
-            if(text != String.Empty) botClient.SendTextMessageAsync(key,"Список слов для тренировки:\n" + text);
-            else botClient.SendTextMessageAsync(key, "Словарь пуст");
+            if (text != string.Empty)
+            {
+                this.botClient.SendTextMessageAsync(key, "Список слов для тренировки:\n" + text);
+            }
+            else
+            {
+                this.botClient.SendTextMessageAsync(key, "Словарь пуст");
+            }
         }
     }
 }

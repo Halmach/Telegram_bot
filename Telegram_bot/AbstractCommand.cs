@@ -2,11 +2,11 @@
 {
     public abstract class AbstractCommand : IChatCommand
     {
-        public string CommandText;
+        protected string commandText;
 
         public bool CheckMessage(string message)
         {
-            return CommandText == message;
+            return this.commandText == message;
         }
     }
 }

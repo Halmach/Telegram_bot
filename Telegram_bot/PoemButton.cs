@@ -7,15 +7,16 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Telegram_bot
 {
-    class PoemButton : AbstractCommand, IButtonCommand
+    public class PoemButton : AbstractCommand, IButtonCommand
     {
-        ITelegramBotClient botClient;
+        private ITelegramBotClient botClient;
 
         public PoemButton(ITelegramBotClient botClient)
         {
             this.botClient = botClient;
-            CommandText = "/poembuttons";
+            this.commandText = "/poembuttons";
         }
+
         public InlineKeyboardMarkup ReturnKeyBoard()
         {
             var buttonList = new List<InlineKeyboardButton>
@@ -44,13 +45,13 @@ namespace Telegram_bot
 
         public void AddCallBack(Conversation chat)
         {
-            botClient.OnCallbackQuery -= Bot_Callback;
-            botClient.OnCallbackQuery += Bot_Callback;
+            this.botClient.OnCallbackQuery -= this.Bot_Callback;
+            this.botClient.OnCallbackQuery += this.Bot_Callback;
         }
 
         private async void Bot_Callback(object sender, CallbackQueryEventArgs e)
         {
-            var text = "";
+            var text = string.Empty;
 
             switch (e.CallbackQuery.Data)
             {
@@ -69,8 +70,8 @@ namespace Telegram_bot
                     break;
             }
 
-            await botClient.SendTextMessageAsync(e.CallbackQuery.Message.Chat.Id, text);
-            await botClient.AnswerCallbackQueryAsync(e.CallbackQuery.Id);
+            await this.botClient.SendTextMessageAsync(e.CallbackQuery.Message.Chat.Id, text);
+            await this.botClient.AnswerCallbackQueryAsync(e.CallbackQuery.Id);
         }
     }
 }

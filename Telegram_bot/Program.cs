@@ -3,26 +3,23 @@ using Telegram.Bot.Args;
 
 namespace Telegram_bot
 {
-    class Program
+    internal class Program
     {
-
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
             var bot = new BotWorker();
             bot.Initialize(BotCredentials.BotToken);
             bot.Start();
             Console.WriteLine("Напишите stop для прекращения работы");
 
-
             string command;
             do
             {
                 command = Console.ReadLine();
-            } while (command != "stop");
+            } 
+            while (command != "stop");
 
             bot.Stop();
         }
-
-
     }
 }

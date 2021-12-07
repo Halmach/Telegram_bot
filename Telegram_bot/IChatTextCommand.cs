@@ -2,9 +2,8 @@
 
 namespace Telegram_bot
 {
-    interface IChatTextCommand
+    public interface IChatTextCommand
     {
-
         string ReturnText();
     }
 }

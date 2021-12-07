@@ -5,13 +5,12 @@
     {
         public SayHiCommand()
         {
-            CommandText = "/saymehi";
+            this.commandText = "/saymehi";
         }
 
         public string ReturnText()
         {
             return "привет";
         }
-
     }
 }

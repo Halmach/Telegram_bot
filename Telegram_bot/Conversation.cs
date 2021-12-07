@@ -6,38 +6,40 @@ namespace Telegram_bot
 {
     public class Conversation
     {
+        private Dictionary<string, Word> wordDictionary;
+
         private Chat telegramChat;
 
         private List<Message> telegramMessages;
-
-        public Dictionary<string, Word> wordDictionary;
-        
 
         private bool isAddInProgress = false;
 
         private bool isTrainingInProgress = false;
 
-        public bool IsAddInProgress { get => isAddInProgress; set => isAddInProgress = value; }
-        public bool IsTrainingInProgress { get => isTrainingInProgress; set => isTrainingInProgress = value; }
-
         public Conversation(Chat chat)
         {
-            telegramChat = chat;
-            telegramMessages = new List<Message>();
-            wordDictionary = new Dictionary<string, Word>();
+            this.telegramChat = chat;
+            this.telegramMessages = new List<Message>();
+            this.WordDictionary = new Dictionary<string, Word>();
         }
 
-        public void AddMessage(Message eMessage)
+        public bool IsAddInProgress { get => this.isAddInProgress; set => this.isAddInProgress = value; }
+
+        public bool IsTrainingInProgress { get => this.isTrainingInProgress; set => this.isTrainingInProgress = value; }
+
+        public Dictionary<string, Word> WordDictionary { get => this.wordDictionary; set => this.wordDictionary = value; }
+
+        public void AddMessage(Message message)
         {
-            telegramMessages.Add(eMessage);
+            this.telegramMessages.Add(message);
         }
 
-        public long GetId() => telegramChat.Id;
+        public long GetId() => this.telegramChat.Id;
 
         public List<string> GetTextMessages()
         {
             var textMessages = new List<string>();
-            foreach (var message in telegramMessages)
+            foreach (var message in this.telegramMessages)
             {
                 if (message.Text != null)
                 {
@@ -48,8 +50,6 @@ namespace Telegram_bot
             return textMessages;
         }
 
-        public string GetLastMessage() => telegramMessages[telegramMessages.Count - 1].Text.Trim().ToLower();
-
-        
+        public string GetLastMessage() => this.telegramMessages[this.telegramMessages.Count - 1].Text.Trim().ToLower();     
     }
 }

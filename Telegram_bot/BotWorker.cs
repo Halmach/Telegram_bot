@@ -3,36 +3,34 @@ using Telegram.Bot.Args;
 
 namespace Telegram_bot
 {
-    class BotWorker
+    public class BotWorker
     {
-        ITelegramBotClient botClient;
+        private ITelegramBotClient botClient;
         private BotMessageLogic logic;
+
         public void Initialize(string token)
         {
-            botClient = new TelegramBotClient(token);
-            logic = new BotMessageLogic(botClient);
+            this.botClient = new TelegramBotClient(token);
+            this.logic = new BotMessageLogic(this.botClient);
         }
 
         public void Start()
         {
-            botClient.OnMessage += BotClient_OnMessage;
-            botClient.StartReceiving();
-
+            this.botClient.OnMessage += this.BotClient_OnMessage;
+            this.botClient.StartReceiving();
         }
-
-        private  async void BotClient_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
-        {
-            if (e.Message.Text != null)
-            {
-                await logic.Response(e);
-            }
-        }
-
 
         public void Stop()
         {
-            botClient.StopReceiving();
+            this.botClient.StopReceiving();
         }
 
+        private async void BotClient_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
+        {
+            if (e.Message.Text != null)
+            {
+                await this.logic.Response(e);
+            }
+        }
     }
 }

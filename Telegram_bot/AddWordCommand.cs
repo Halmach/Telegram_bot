@@ -5,55 +5,58 @@ using Telegram.Bot;
 
 namespace Telegram_bot
 {
+    /// <summary>
+    /// AddWordCommand Class
+    /// </summary>
     public class AddWordCommand : AbstractCommand
     {
-        ITelegramBotClient botClient;
-        Dictionary<long, Word> wordBufferOfChat;
+        private ITelegramBotClient botClient;
+        private Dictionary<long, Word> wordBufferOfChat;
+
         public AddWordCommand(ITelegramBotClient botClient)
         {
             this.botClient = botClient;
-            CommandText = "/addword";
-            wordBufferOfChat = new Dictionary<long, Word>();
+            this.commandText = "/addword";
+            this.wordBufferOfChat = new Dictionary<long, Word>();
         }
 
         public async void ExecuteCommandAsync(Conversation chat)
         {
-            wordBufferOfChat.Add(chat.GetId(), new Word());
+            this.wordBufferOfChat.Add(chat.GetId(), new Word());
             var text = "Введите русское значение слова";
-            await SendCommandText(text: text, chat: chat.GetId());
-        }
-
-
-        private async Task SendCommandText(string text, long chat)
-        {
-            await botClient.SendTextMessageAsync(chat, text: text);
+            await this.SendCommandText(text: text, chat: chat.GetId());
         }
 
         public async void NextStep(Conversation chat, string message, AddState addState)
         {
-            var text = String.Empty;
-            var word = wordBufferOfChat[chat.GetId()];
+            var text = string.Empty;
+            var word = this.wordBufferOfChat[chat.GetId()];
             message = message.ToLower().Trim();
             switch (addState)
             {
                 case AddState.Russian:
-                    word.russian = message;        
+                    word.Russian = message;        
                     text = "Введите английское значение слова"; 
                     break;
                 case AddState.English:
-                    word.english = message;
+                    word.English = message;
                     text = "Введите тематику";
                     break;
                 case AddState.Theme:
-                    word.theme = message;
-                    text = $"Успешно! Слово {word.russian} добавлено в словарь";
+                    word.Theme = message;
+                    text = $"Успешно! Слово {word.Russian} добавлено в словарь";
                     chat.IsAddInProgress = false;
-                    chat.wordDictionary.Add(word.russian, word);
-                    wordBufferOfChat.Remove(chat.GetId());
+                    chat.WordDictionary.Add(word.Russian, word);
+                    this.wordBufferOfChat.Remove(chat.GetId());
                     break;
             }
-            await SendCommandText(text: text, chat: chat.GetId());
 
+            await this.SendCommandText(text: text, chat: chat.GetId());
+        }
+
+        private async Task SendCommandText(string text, long chat)
+        {
+            await this.botClient.SendTextMessageAsync(chat, text: text);
         }
     }
 }

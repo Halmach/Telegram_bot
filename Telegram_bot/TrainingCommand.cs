@@ -9,67 +9,36 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Telegram_bot
 {
-    class TrainingCommand : AbstractCommand, IButtonCommand
+    public class TrainingCommand : AbstractCommand, IButtonCommand
     {
-        Dictionary<long, TrainingType> trainerType;
-        Dictionary<long, Conversation> trainerChats;
-        Dictionary<long, string> currentWord;
-        ITelegramBotClient botClient;
+        private Dictionary<long, TrainingType> trainerType;
+        private Dictionary<long, Conversation> trainerChats;
+        private Dictionary<long, string> currentWord;
+        private ITelegramBotClient botClient;
 
         public TrainingCommand(ITelegramBotClient botClient)
         {
             this.botClient = botClient;
-            CommandText = "/training";
-            trainerType = new Dictionary<long, TrainingType>();
-            trainerChats = new Dictionary<long, Conversation>();
-            currentWord = new Dictionary<long, string>();
+            this.commandText = "/training";
+            this.trainerType = new Dictionary<long, TrainingType>();
+            this.trainerChats = new Dictionary<long, Conversation>();
+            this.currentWord = new Dictionary<long, string>();
         }
 
         public void AddCallBack(Conversation chat)
         {
             var id = chat.GetId();
-            if (!trainerChats.ContainsKey(id)) trainerChats.Add(id, chat); else trainerChats[id] = chat;
-            botClient.OnCallbackQuery -= Bot_Callback;
-            botClient.OnCallbackQuery += Bot_Callback;      
-        }
-
-        private async void Bot_Callback(object sender, CallbackQueryEventArgs e)
-        {
-            var text = "";
-            var id = e.CallbackQuery.Message.Chat.Id;
-            Conversation chat;
-            if (trainerChats.ContainsKey(id))
+            if (!this.trainerChats.ContainsKey(id))
             {
-                string translate = string.Empty;
-                chat = trainerChats[id];
-                if (chat.wordDictionary.Count > 0) chat.IsTrainingInProgress = true;
-                switch (e.CallbackQuery.Data) 
-                {
-                    case "rusToEng":
-                        text = GetWord(chat, TrainingType.RusToEng, out translate);
-                        if (chat.wordDictionary.Count > 0) if (!trainerType.ContainsKey(id)) trainerType.Add(id, TrainingType.RusToEng); else trainerType[id] = TrainingType.RusToEng;
-                        break;
-                    case "engToRus":
-                        text = GetWord(chat, TrainingType.EngToRus, out translate);
-                        if (chat.wordDictionary.Count > 0) if (!trainerType.ContainsKey(id)) trainerType.Add(id, TrainingType.EngToRus); else trainerType[id] = TrainingType.EngToRus;    
-                        break;
-                    default:
-                        break;
-                }
-
-                if (trainerChats.ContainsKey(id)) trainerChats.Remove(id);
-                if (chat.wordDictionary.Count > 0) if (!currentWord.ContainsKey(id)) currentWord.Add(id, translate); else currentWord[id] = translate;  
-
-                await botClient.SendTextMessageAsync(id, text);
-                await botClient.AnswerCallbackQueryAsync(e.CallbackQuery.Id);
+                this.trainerChats.Add(id, chat);
             }
             else
             {
-                if (trainerChats.ContainsKey(id)) trainerChats.Remove(id);
-                text = "Словарь пуст";
-                await botClient.SendTextMessageAsync(id, text);
-                await botClient.AnswerCallbackQueryAsync(e.CallbackQuery.Id);
+                this.trainerChats[id] = chat;
             }
+
+            this.botClient.OnCallbackQuery -= this.Bot_Callback;
+            this.botClient.OnCallbackQuery += this.Bot_Callback;      
         }
 
         public string GetInformation()
@@ -79,16 +48,17 @@ namespace Telegram_bot
 
         public string GetWord(Conversation chat, TrainingType type, out string text)
         {
-            text = String.Empty;
+            text = string.Empty;
             Random rnd = new Random();
-            var Index = 0;
-            if (chat.wordDictionary.Count != 0)
+            var index = 0;
+            if (chat.WordDictionary.Count != 0)
             {
-                Index = rnd.Next(0, chat.wordDictionary.Count);
-                var element = chat.wordDictionary.Values.ElementAt(Index);
-                text = (type == TrainingType.EngToRus) ? element.russian : element.english;
-                return (type == TrainingType.EngToRus) ? element.english : element.russian;
+                index = rnd.Next(0, chat.WordDictionary.Count);
+                var element = chat.WordDictionary.Values.ElementAt(index);
+                text = (type == TrainingType.EngToRus) ? element.Russian : element.English;
+                return (type == TrainingType.EngToRus) ? element.English : element.Russian;
             }
+
             return "Словарь пуст";
         }
 
@@ -112,22 +82,112 @@ namespace Telegram_bot
             return keyboard;
         }
 
-        private async Task SendCommandText(string text, long chat)
-        {
-            await botClient.SendTextMessageAsync(chat, text: text);
-        }
-
         public async void NextWord(Conversation chat, string message)
         {
-            var text = String.Empty;
+            var text = string.Empty;
             var id = chat.GetId();
             string translate = string.Empty;
             message = message.ToLower().Trim(); /// currentWord[id]
-            if (message == currentWord[id]) text += "Ответ верный\n";
-            else text += $"Ответ неверный! Правильный ответ:{currentWord[id]}\n";
-            text += GetWord(chat, trainerType[id], out translate);
-            currentWord[id] = translate;
-            await SendCommandText(text: text, chat: chat.GetId());
+            if (message == this.currentWord[id])
+            {
+                text += "Ответ верный\n";
+            }
+            else
+            {
+                text += $"Ответ неверный! Правильный ответ:{currentWord[id]}\n";
+            }
+
+            text += this.GetWord(chat, this.trainerType[id], out translate);
+            this.currentWord[id] = translate;
+            await this.SendCommandText(text: text, chat: chat.GetId());
+        }
+
+        private async Task SendCommandText(string text, long chat)
+        {
+            await this.botClient.SendTextMessageAsync(chat, text: text);
+        }
+
+        private async void Bot_Callback(object sender, CallbackQueryEventArgs e)
+        {
+            var text = string.Empty;
+            var id = e.CallbackQuery.Message.Chat.Id;
+            Conversation chat;
+            if (this.trainerChats.ContainsKey(id))
+            {
+                string translate = string.Empty;
+                chat = this.trainerChats[id];
+                if (chat.WordDictionary.Count > 0)
+                {
+                    chat.IsTrainingInProgress = true;
+                }
+
+                switch (e.CallbackQuery.Data)
+                {
+                    case "rusToEng":
+                        text = this.GetWord(chat, TrainingType.RusToEng, out translate);
+                        if (chat.WordDictionary.Count > 0)
+                        {
+                            if (!this.trainerType.ContainsKey(id))
+                            {
+                                this.trainerType.Add(id, TrainingType.RusToEng);
+                            }
+                            else
+                            {
+                                this.trainerType[id] = TrainingType.RusToEng;
+                            }
+                        }
+
+                        break;
+                    case "engToRus":
+                        text = this.GetWord(chat, TrainingType.EngToRus, out translate);
+                        if (chat.WordDictionary.Count > 0)
+                        {
+                            if (!this.trainerType.ContainsKey(id))
+                            {
+                                this.trainerType.Add(id, TrainingType.EngToRus);
+                            }
+                            else
+                            {
+                                this.trainerType[id] = TrainingType.EngToRus;
+                            }
+                        }
+
+                        break;
+                    default:
+                        break;
+                }
+
+                if (this.trainerChats.ContainsKey(id))
+                {
+                    this.trainerChats.Remove(id);
+                }
+
+                if (chat.WordDictionary.Count > 0)
+                {
+                    if (!this.currentWord.ContainsKey(id))
+                    {
+                        this.currentWord.Add(id, translate);
+                    }
+                    else
+                    {
+                        this.currentWord[id] = translate;
+                    }
+                }
+
+                await this.botClient.SendTextMessageAsync(id, text);
+                await this.botClient.AnswerCallbackQueryAsync(e.CallbackQuery.Id);
+            }
+            else
+            {
+                if (this.trainerChats.ContainsKey(id))
+                {
+                    this.trainerChats.Remove(id);
+                }
+
+                text = "Словарь пуст";
+                await this.botClient.SendTextMessageAsync(id, text);
+                await this.botClient.AnswerCallbackQueryAsync(e.CallbackQuery.Id);
+            }
         }
     }
 }

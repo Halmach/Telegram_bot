@@ -5,81 +5,41 @@ using Telegram.Bot.Types.ReplyMarkups;
 
 namespace Telegram_bot
 {
-    class Messenger
+    public class Messenger
     {
         private CommandParser parser;
         private ITelegramBotClient botClient;
 
         public Messenger(ITelegramBotClient telegramBotClient)
         {
-            botClient = telegramBotClient;
-            parser = new CommandParser(botClient);
+            this.botClient = telegramBotClient;
+            this.parser = new CommandParser(this.botClient);
         }
+
         public async Task MakeAnswer(Conversation chat)
         {
             var lastmessage = chat.GetLastMessage();
-            if(chat.IsTrainingInProgress && !parser.IsTextCommandWithAction(lastmessage))
+            if (chat.IsTrainingInProgress && !this.parser.IsTextCommandWithAction(lastmessage))
             {
-                parser.NextWord(chat,lastmessage);
+                this.parser.NextWord(chat, lastmessage);
                 return;
             }
-            if(chat.IsAddInProgress)
+
+            if (chat.IsAddInProgress)
             {
-                parser.NextStage(chat, lastmessage);
+                this.parser.NextStage(chat, lastmessage);
                 return;
             }
-            if (parser.IsCommand(lastmessage))
+
+            if (this.parser.IsCommand(lastmessage))
             {
-                await ExecCommand(chat, lastmessage);
+                await this.ExecCommand(chat, lastmessage);
             }
             else
             {
                 // var text = CreateMessageError();
-                var text = CreateTextMessage(chat);
-                await SendText(chat, text);
-            }
-        }
-
-        private async Task SendText(Conversation chat, string text)
-        {
-            await botClient.SendTextMessageAsync(chatId: chat.GetId(), text: text);
-        }
-
-        private async Task SendTextAndKeyBoard(Conversation chat, string text, InlineKeyboardMarkup keyboard)
-        {
-            await botClient.SendTextMessageAsync(chatId: chat.GetId(), text: text, replyMarkup: keyboard);
-        }
-
-        private string CreateMessageError()
-        {
-            return "Is not command";
-        }
-
-        private async Task ExecCommand(Conversation chat, string lastmessage)
-        {
-            if (parser.IsTextCommand(lastmessage))
-            {
-                var text = parser.GetTextCommandAnswer(lastmessage);
-                await SendText(chat, text);
-            }
-
-            if (parser.IsButtonCommand(lastmessage))
-            {
-                var text = parser.GetTextButtonCommand(lastmessage); 
-                var key = parser.GetKeyBoard(lastmessage);
-                parser.AddCallback(lastmessage, chat);
-                await SendTextAndKeyBoard(chat,text,key);
-            }
-
-            if (parser.IsAddCommand(lastmessage))
-            {
-                chat.IsAddInProgress = true;
-                parser.AddWord(lastmessage,chat);
-            }
-
-            if(parser.IsTextCommandWithAction(lastmessage))
-            {
-                parser.DoForTextCommandWithAction(chat, lastmessage);
+                var text = this.CreateTextMessage(chat);
+                await this.SendText(chat, text);
             }
         }
 
@@ -93,6 +53,47 @@ namespace Telegram_bot
             return text;
         }
 
+        private async Task SendText(Conversation chat, string text)
+        {
+            await this.botClient.SendTextMessageAsync(chatId: chat.GetId(), text: text);
+        }
 
+        private async Task SendTextAndKeyBoard(Conversation chat, string text, InlineKeyboardMarkup keyboard)
+        {
+            await this.botClient.SendTextMessageAsync(chatId: chat.GetId(), text: text, replyMarkup: keyboard);
+        }
+
+        private string CreateMessageError()
+        {
+            return "Is not command";
+        }
+
+        private async Task ExecCommand(Conversation chat, string lastmessage)
+        {
+            if (this.parser.IsTextCommand(lastmessage))
+            {
+                var text = this.parser.GetTextCommandAnswer(lastmessage);
+                await this.SendText(chat, text);
+            }
+
+            if (this.parser.IsButtonCommand(lastmessage))
+            {
+                var text = this.parser.GetTextButtonCommand(lastmessage); 
+                var key = this.parser.GetKeyBoard(lastmessage);
+                this.parser.AddCallback(lastmessage, chat);
+                await this.SendTextAndKeyBoard(chat, text, key);
+            }
+
+            if (this.parser.IsAddCommand(lastmessage))
+            {
+                chat.IsAddInProgress = true;
+                this.parser.AddWord(lastmessage, chat);
+            }
+
+            if (this.parser.IsTextCommandWithAction(lastmessage))
+            {
+                this.parser.DoForTextCommandWithAction(chat, lastmessage);
+            }
+        }
     }
 }
