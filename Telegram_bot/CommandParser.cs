@@ -21,6 +21,7 @@ namespace Telegram_bot
             Command.Add(new DeleteCommand(botClient));
             Command.Add(new ShowDictionaryCommand(botClient));
             Command.Add(new TrainingCommand(botClient));
+            Command.Add(new StopTrainingCommand(botClient));
             Addcontroller = new AddController();
         }
 

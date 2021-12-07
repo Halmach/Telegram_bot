@@ -18,7 +18,7 @@ namespace Telegram_bot
         public async Task MakeAnswer(Conversation chat)
         {
             var lastmessage = chat.GetLastMessage();
-            if(chat.IsTrainingInProgress)
+            if(chat.IsTrainingInProgress && !parser.IsTextCommandWithAction(lastmessage))
             {
                 parser.NextWord(chat,lastmessage);
                 return;

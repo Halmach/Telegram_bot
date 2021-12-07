@@ -27,7 +27,8 @@ namespace Telegram_bot
 
         public void AddCallBack(Conversation chat)
         {
-            trainerChats.Add(chat.GetId(), chat);
+            var id = chat.GetId();
+            if (!trainerChats.ContainsKey(id)) trainerChats.Add(id, chat); else trainerChats[id] = chat;
             botClient.OnCallbackQuery -= Bot_Callback;
             botClient.OnCallbackQuery += Bot_Callback;      
         }
@@ -46,18 +47,18 @@ namespace Telegram_bot
                 {
                     case "rusToEng":
                         text = GetWord(chat, TrainingType.RusToEng, out translate);
-                        if (chat.wordDictionary.Count > 0) trainerType.Add(id, TrainingType.RusToEng);
+                        if (chat.wordDictionary.Count > 0) if (!trainerType.ContainsKey(id)) trainerType.Add(id, TrainingType.RusToEng); else trainerType[id] = TrainingType.RusToEng;
                         break;
                     case "engToRus":
                         text = GetWord(chat, TrainingType.EngToRus, out translate);
-                        if (chat.wordDictionary.Count > 0) trainerType.Add(id, TrainingType.EngToRus);
+                        if (chat.wordDictionary.Count > 0) if (!trainerType.ContainsKey(id)) trainerType.Add(id, TrainingType.EngToRus); else trainerType[id] = TrainingType.EngToRus;    
                         break;
                     default:
                         break;
                 }
 
                 if (trainerChats.ContainsKey(id)) trainerChats.Remove(id);
-                if (chat.wordDictionary.Count > 0) currentWord.Add(id, translate);
+                if (chat.wordDictionary.Count > 0) if (!currentWord.ContainsKey(id)) currentWord.Add(id, translate); else currentWord[id] = translate;  
 
                 await botClient.SendTextMessageAsync(id, text);
                 await botClient.AnswerCallbackQueryAsync(e.CallbackQuery.Id);
